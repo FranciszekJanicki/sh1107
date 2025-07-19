@@ -36,14 +36,19 @@ static sh1107_err_t sh1107_gpio_initialize(sh1107_t const* sh1107)
 static sh1107_err_t sh1107_gpio_deinitialize(sh1107_t const* sh1107)
 {
     return sh1107->interface.gpio_deinitialize
-               ? sh1107->interface.gpio_deinitialize(sh1107->interface.gpio_user)
+               ? sh1107->interface.gpio_deinitialize(
+                     sh1107->interface.gpio_user)
                : SH1107_ERR_NULL;
 }
 
-static sh1107_err_t sh1107_gpio_write(sh1107_t const* sh1107, uint32_t pin, bool state)
+static sh1107_err_t sh1107_gpio_write(sh1107_t const* sh1107,
+                                      uint32_t pin,
+                                      bool state)
 {
     return sh1107->interface.gpio_write
-               ? sh1107->interface.gpio_write(sh1107->interface.gpio_user, pin, state)
+               ? sh1107->interface.gpio_write(sh1107->interface.gpio_user,
+                                              pin,
+                                              state)
                : SH1107_ERR_NULL;
 }
 
@@ -66,7 +71,9 @@ static sh1107_err_t sh1107_bus_transmit(sh1107_t const* sh1107,
                                         size_t data_size)
 {
     return sh1107->interface.bus_transmit
-               ? sh1107->interface.bus_transmit(sh1107->interface.bus_user, data, data_size)
+               ? sh1107->interface.bus_transmit(sh1107->interface.bus_user,
+                                                data,
+                                                data_size)
                : SH1107_ERR_NULL;
 }
 
@@ -74,8 +81,9 @@ static sh1107_err_t sh1107_bus_transmit_command(sh1107_t const* sh1107,
                                                 uint8_t* data,
                                                 size_t data_size)
 {
-    sh1107_err_t err =
-        sh1107_gpio_write(sh1107, sh1107->config.control_pin, SH1107_CONTROL_SELECT_COMMAND);
+    sh1107_err_t err = sh1107_gpio_write(sh1107,
+                                         sh1107->config.control_pin,
+                                         SH1107_CONTROL_SELECT_COMMAND);
     err |= sh1107_bus_transmit(sh1107, data, data_size);
 
     return err;
@@ -85,8 +93,9 @@ static sh1107_err_t sh1107_bus_transmit_display(sh1107_t const* sh1107,
                                                 uint8_t const* data,
                                                 size_t data_size)
 {
-    sh1107_err_t err =
-        sh1107_gpio_write(sh1107, sh1107->config.control_pin, SH1107_CONTROL_SELECT_DISPLAY);
+    sh1107_err_t err = sh1107_gpio_write(sh1107,
+                                         sh1107->config.control_pin,
+                                         SH1107_CONTROL_SELECT_DISPLAY);
     err |= sh1107_bus_transmit(sh1107, data, data_size);
 
     return err;
@@ -136,7 +145,8 @@ sh1107_err_t sh1107_display_frame_buf(sh1107_t const* sh1107)
         err |= sh1107_bus_transmit_command(sh1107, &cmd, sizeof(cmd));
 
         err |= sh1107_bus_transmit_display(sh1107,
-                                           sh1107->frame_buf + page * SH1107_SCREEN_WIDTH,
+                                           sh1107->frame_buf +
+                                               page * SH1107_SCREEN_WIDTH,
                                            SH1107_SCREEN_WIDTH);
     }
 
@@ -150,7 +160,10 @@ void sh1107_clear_frame_buf(sh1107_t* sh1107)
     memset(sh1107->frame_buf, 0, sizeof(sh1107->frame_buf));
 }
 
-sh1107_err_t sh1107_set_pixel(sh1107_t* sh1107, uint8_t x, uint8_t y, bool color)
+sh1107_err_t sh1107_set_pixel(sh1107_t* sh1107,
+                              uint8_t x,
+                              uint8_t y,
+                              bool color)
 {
     assert(sh1107);
 
@@ -161,8 +174,9 @@ sh1107_err_t sh1107_set_pixel(sh1107_t* sh1107, uint8_t x, uint8_t y, bool color
     size_t byte_index = (y / 8) * SH1107_SCREEN_WIDTH + x;
     uint8_t bit_mask = 1 << (y % 8);
 
-    sh1107->frame_buf[byte_index] = color ? (sh1107->frame_buf[byte_index] | bit_mask)
-                                          : (sh1107->frame_buf[byte_index] & ~bit_mask);
+    sh1107->frame_buf[byte_index] =
+        color ? (sh1107->frame_buf[byte_index] | bit_mask)
+              : (sh1107->frame_buf[byte_index] & ~bit_mask);
 
     return SH1107_ERR_OK;
 }
@@ -227,7 +241,8 @@ sh1107_err_t sh1107_draw_rect(sh1107_t* sh1107,
 
     for (int x = x_start; x < x_end; x++) {
         for (int y = y_start; y < y_end; y++) {
-            if (color || (x <= x_start || x >= x_end - 1) || (y <= y_start || y >= y_end - 1)) {
+            if (color || (x <= x_start || x >= x_end - 1) ||
+                (y <= y_start || y >= y_end - 1)) {
                 err |= sh1107_set_pixel(sh1107, x, y, true);
             }
         }
@@ -236,7 +251,11 @@ sh1107_err_t sh1107_draw_rect(sh1107_t* sh1107,
     return err;
 }
 
-sh1107_err_t sh1107_draw_circle(sh1107_t* sh1107, uint8_t x0, uint8_t y0, uint8_t r, bool color)
+sh1107_err_t sh1107_draw_circle(sh1107_t* sh1107,
+                                uint8_t x0,
+                                uint8_t y0,
+                                uint8_t r,
+                                bool color)
 {
     assert(sh1107);
 
@@ -313,7 +332,10 @@ sh1107_err_t sh1107_draw_char(sh1107_t* sh1107, uint8_t x, uint8_t y, char c)
     return err;
 }
 
-sh1107_err_t sh1107_draw_string(sh1107_t* sh1107, uint8_t x, uint8_t y, char const* s)
+sh1107_err_t sh1107_draw_string(sh1107_t* sh1107,
+                                uint8_t x,
+                                uint8_t y,
+                                char const* s)
 {
     assert(sh1107);
 
@@ -370,7 +392,8 @@ sh1107_err_t sh1107_device_reset(sh1107_t const* sh1107)
     return err;
 }
 
-sh1107_err_t sh1107_send_set_lower_column_address_cmd(sh1107_t const* sh1107, uint8_t address)
+sh1107_err_t sh1107_send_set_lower_column_address_cmd(sh1107_t const* sh1107,
+                                                      uint8_t address)
 {
     assert(sh1107);
 
@@ -382,7 +405,8 @@ sh1107_err_t sh1107_send_set_lower_column_address_cmd(sh1107_t const* sh1107, ui
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_higher_column_address_cmd(sh1107_t const* sh1107, uint8_t address)
+sh1107_err_t sh1107_send_set_higher_column_address_cmd(sh1107_t const* sh1107,
+                                                       uint8_t address)
 {
     assert(sh1107);
 
@@ -394,7 +418,8 @@ sh1107_err_t sh1107_send_set_higher_column_address_cmd(sh1107_t const* sh1107, u
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_memory_addressing_mode_cmd(sh1107_t const* sh1107, uint8_t mode)
+sh1107_err_t sh1107_send_set_memory_addressing_mode_cmd(sh1107_t const* sh1107,
+                                                        uint8_t mode)
 {
     assert(sh1107);
 
@@ -406,7 +431,8 @@ sh1107_err_t sh1107_send_set_memory_addressing_mode_cmd(sh1107_t const* sh1107, 
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_segment_remap_cmd(sh1107_t const* sh1107, uint8_t remap)
+sh1107_err_t sh1107_send_set_segment_remap_cmd(sh1107_t const* sh1107,
+                                               uint8_t remap)
 {
     assert(sh1107);
 
@@ -418,7 +444,8 @@ sh1107_err_t sh1107_send_set_segment_remap_cmd(sh1107_t const* sh1107, uint8_t r
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_entire_display_on_off_cmd(sh1107_t const* sh1107, uint8_t on_off)
+sh1107_err_t sh1107_send_set_entire_display_on_off_cmd(sh1107_t const* sh1107,
+                                                       uint8_t on_off)
 {
     assert(sh1107);
 
@@ -430,7 +457,8 @@ sh1107_err_t sh1107_send_set_entire_display_on_off_cmd(sh1107_t const* sh1107, u
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_normal_reverse_display_cmd(sh1107_t const* sh1107, uint8_t display)
+sh1107_err_t sh1107_send_set_normal_reverse_display_cmd(sh1107_t const* sh1107,
+                                                        uint8_t display)
 {
     assert(sh1107);
 
@@ -442,7 +470,8 @@ sh1107_err_t sh1107_send_set_normal_reverse_display_cmd(sh1107_t const* sh1107, 
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_display_on_off_cmd(sh1107_t const* sh1107, uint8_t on_off)
+sh1107_err_t sh1107_send_set_display_on_off_cmd(sh1107_t const* sh1107,
+                                                uint8_t on_off)
 {
     assert(sh1107);
 
@@ -454,7 +483,8 @@ sh1107_err_t sh1107_send_set_display_on_off_cmd(sh1107_t const* sh1107, uint8_t 
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_page_address_cmd(sh1107_t const* sh1107, uint8_t address)
+sh1107_err_t sh1107_send_set_page_address_cmd(sh1107_t const* sh1107,
+                                              uint8_t address)
 {
     assert(sh1107);
 
@@ -466,7 +496,8 @@ sh1107_err_t sh1107_send_set_page_address_cmd(sh1107_t const* sh1107, uint8_t ad
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_output_scan_direction_cmd(sh1107_t const* sh1107, uint8_t direction)
+sh1107_err_t sh1107_send_set_output_scan_direction_cmd(sh1107_t const* sh1107,
+                                                       uint8_t direction)
 {
     assert(sh1107);
 
@@ -527,7 +558,8 @@ sh1107_err_t sh1107_send_read_id_cmd(sh1107_t const* sh1107,
     return sh1107_bus_transmit_command(sh1107, &data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_contrast_control_cmd(sh1107_t const* sh1107, uint8_t contrast)
+sh1107_err_t sh1107_send_set_contrast_control_cmd(sh1107_t const* sh1107,
+                                                  uint8_t contrast)
 {
     assert(sh1107);
 
@@ -539,7 +571,8 @@ sh1107_err_t sh1107_send_set_contrast_control_cmd(sh1107_t const* sh1107, uint8_
     return sh1107_bus_transmit_command(sh1107, data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_multiplex_ratio_cmd(sh1107_t const* sh1107, uint8_t ratio)
+sh1107_err_t sh1107_send_set_multiplex_ratio_cmd(sh1107_t const* sh1107,
+                                                 uint8_t ratio)
 {
     assert(sh1107);
 
@@ -551,7 +584,8 @@ sh1107_err_t sh1107_send_set_multiplex_ratio_cmd(sh1107_t const* sh1107, uint8_t
     return sh1107_bus_transmit_command(sh1107, data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_display_offset_cmd(sh1107_t const* sh1107, uint8_t offset)
+sh1107_err_t sh1107_send_set_display_offset_cmd(sh1107_t const* sh1107,
+                                                uint8_t offset)
 {
     assert(sh1107);
 
@@ -563,7 +597,8 @@ sh1107_err_t sh1107_send_set_display_offset_cmd(sh1107_t const* sh1107, uint8_t 
     return sh1107_bus_transmit_command(sh1107, data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_dc_dc_setting_cmd(sh1107_t const* sh1107, uint8_t setting)
+sh1107_err_t sh1107_send_set_dc_dc_setting_cmd(sh1107_t const* sh1107,
+                                               uint8_t setting)
 {
     assert(sh1107);
 
@@ -603,7 +638,8 @@ sh1107_err_t sh1107_send_set_charge_period_cmd(sh1107_t const* sh1107,
     return sh1107_bus_transmit_command(sh1107, data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_vcom_deselect_level_cmd(sh1107_t const* sh1107, uint8_t level)
+sh1107_err_t sh1107_send_set_vcom_deselect_level_cmd(sh1107_t const* sh1107,
+                                                     uint8_t level)
 {
     assert(sh1107);
 
@@ -615,7 +651,8 @@ sh1107_err_t sh1107_send_set_vcom_deselect_level_cmd(sh1107_t const* sh1107, uin
     return sh1107_bus_transmit_command(sh1107, data, sizeof(data));
 }
 
-sh1107_err_t sh1107_send_set_display_start_line_cmd(sh1107_t const* sh1107, uint8_t line)
+sh1107_err_t sh1107_send_set_display_start_line_cmd(sh1107_t const* sh1107,
+                                                    uint8_t line)
 {
     assert(sh1107);
 
