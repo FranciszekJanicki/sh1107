@@ -5,6 +5,10 @@
 #include "sh1107_config.h"
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     sh1107_config_t config;
     sh1107_interface_t interface;
@@ -107,5 +111,9 @@ sh1107_err_t sh1107_send_set_vcom_deselect_level_cmd(sh1107_t const* sh1107,
                                                      uint8_t level);
 sh1107_err_t sh1107_send_set_display_start_line_cmd(sh1107_t const* sh1107,
                                                     uint8_t line);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SH1107_SH1107_H

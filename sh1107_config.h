@@ -6,6 +6,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SH1107_SCREEN_WIDTH 128U
 #define SH1107_BYTE_HEIGHT 5U
 #define SH1107_BYTE_WIDTH 7U
@@ -47,5 +51,9 @@ typedef struct {
     sh1107_err_t (*bus_deinitialize)(void*);
     sh1107_err_t (*bus_transmit)(void*, uint8_t const*, size_t);
 } sh1107_interface_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SH1107_SH1107_CONFIG_H

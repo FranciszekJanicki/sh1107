@@ -1,6 +1,10 @@
 #ifndef SH1107_SH1107_COMMANDS_H
 #define SH1107_SH1107_COMMANDS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     SH1107_CMD_SET_LOWER_COLUMN_ADDRESS = 0b0000,
     SH1107_CMD_SET_HIGHER_COLUMN_ADDRESS = 0b00010,
@@ -23,5 +27,9 @@ typedef enum {
     SH1107_CMD_SET_VCOM_DESELECT_LEVEL = 0b11011011,
     SH1107_CMD_SET_DISPLAY_START_LINE = 0b11011100,
 } sh1107_cmd_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SH1107_SH1107_COMMANDS_H

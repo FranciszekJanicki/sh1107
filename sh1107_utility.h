@@ -6,6 +6,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 inline bool sh1107_bitmap_get_pixel(uint8_t width,
                                     uint8_t height,
                                     uint8_t (*bitmap)[width * height / 8],
@@ -67,5 +71,9 @@ inline void sh1107_bitmap_resize(
         }
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SH1107_SH1107_UTILITY_H
